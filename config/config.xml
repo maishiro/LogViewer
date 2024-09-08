@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+	<pageTitle>Log Viewer</pageTitle>
+	<pageDescription>View and monitor log entries</pageDescription>
+	<refreshInterval>5000</refreshInterval>
+	<maxEntries>100</maxEntries>
+</configuration>

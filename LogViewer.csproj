@@ -12,4 +12,9 @@
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
 
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="xcopy /S /Y /I &quot;$(ProjectDir)config&quot; &quot;$(TargetDir)config\&quot;" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="mkdir -p &quot;$(TargetDir)config&quot; &amp;&amp; cp -R &quot;$(ProjectDir)config&quot;/* &quot;$(TargetDir)config/&quot;" Condition="'$(OS)' != 'Windows_NT'" />
+  </Target>
+
 </Project>
