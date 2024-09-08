@@ -10,10 +10,12 @@ namespace LogViewer.Controllers
     public class LogController : Controller
     {
         private readonly string _logDirectory;
+        private readonly PageConfig _pageConfig;
 
-        public LogController( IConfiguration configuration )
+        public LogController( IConfiguration configuration, PageConfig pageConfig )
         {
             _logDirectory = configuration ["LogSettings:LogDirectory"];
+            _pageConfig = pageConfig;
         }
 
         public IActionResult Index()
@@ -26,7 +28,7 @@ namespace LogViewer.Controllers
                 using( var reader = new StreamReader( fs, Encoding.UTF8 ) )
                 {
                     string line;
-                    while( ( line = reader.ReadLine() ) != null )
+                    while( ( line = reader.ReadLine() ) != null && logEntries.Count < _pageConfig.MaxEntries )
                     {
                         var parts = line.Split(' ', 2);
                         if( parts.Length == 2 && DateTime.TryParse( parts [0], out DateTime timestamp ) )
@@ -37,6 +39,7 @@ namespace LogViewer.Controllers
                 }
             }
 
+            ViewBag.PageConfig = _pageConfig;
             return View( logEntries );
         }
     }

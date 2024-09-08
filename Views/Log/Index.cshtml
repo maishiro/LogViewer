@@ -3,11 +3,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Log Viewer</title>
+    <title>@ViewBag.PageConfig.PageTitle</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
 </head>
 <body>
     <h1>Log Entries</h1>
+    <p>@ViewBag.PageConfig.PageDescription</p>
     <table border="1" id="logTable">
         <thead>
             <tr>
@@ -38,11 +39,21 @@
             const cell2 = newRow.insertCell(1);
             cell1.textContent = timestamp;
             cell2.textContent = message;
+
+            // 最大エントリ数を超えた場合、古いエントリを削除
+            if( table.rows.length > @ViewBag.PageConfig.MaxEntries ) {
+                table.deleteRow(table.rows.length - 1);
+            }
         });
 
         connection.start().catch(function (err) {
             return console.error(err.toString());
         });
+
+        // 定期的にページをリフレッシュ
+        setInterval( function () {
+            location.reload();
+        }, @ViewBag.PageConfig.RefreshInterval );
     </script>
 </body>
 </html>
