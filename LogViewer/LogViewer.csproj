@@ -13,8 +13,14 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="xcopy /S /Y /I &quot;$(ProjectDir)config&quot; &quot;$(TargetDir)config\&quot;" Condition="'$(OS)' == 'Windows_NT'" />
-    <Exec Command="mkdir -p &quot;$(TargetDir)config&quot; &amp;&amp; cp -R &quot;$(ProjectDir)config&quot;/* &quot;$(TargetDir)config/&quot;" Condition="'$(OS)' != 'Windows_NT'" />
+    <!-- <Exec Command="xcopy /S /Y /I &quot;$(ProjectDir)config&quot; &quot;$(TargetDir)config\&quot;" Condition="'$(OS)' == 'Windows_NT'" /> -->
+    <!-- <Exec Command="mkdir -p &quot;$(TargetDir)config&quot; &amp;&amp; cp -R &quot;$(ProjectDir)config&quot;/* &quot;$(TargetDir)config/&quot;" Condition="'$(OS)' != 'Windows_NT'" /> -->
+    <ItemGroup>
+      <ConfigFiles Include="$(ProjectDir)config/*.xml" />
+    </ItemGroup>
+    <Message Text="Copying config files: @(ConfigFiles)" Importance="high" />
+    <MakeDir Directories="$(TargetDir)config" />
+    <Copy SourceFiles="$(ConfigFiles)" DestinationFolder="$(TargetDir)config" />
   </Target>
 
 </Project>

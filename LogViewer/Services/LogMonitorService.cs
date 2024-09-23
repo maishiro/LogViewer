@@ -55,7 +55,7 @@ namespace LogViewer.Services
 
         private void ProcessLogFile( string filePath )
         {
-            Log.Information( "Processing log file: {FilePath}", filePath );
+            //Log.Information( "Processing log file: {FilePath}", filePath );
 
             if( !filePositions.ContainsKey( filePath ) )
             {
