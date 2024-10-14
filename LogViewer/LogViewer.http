@@ -1,0 +1,13 @@
+﻿@LogViewer_HostAddress = http://localhost:5000
+
+###
+
+POST {{LogViewer_HostAddress}}/api/log
+Content-Type: application/json
+
+{
+  "timestamp": "2024-10-14T10:00:00+09:00",
+  "message": "test"
+}
+
+###

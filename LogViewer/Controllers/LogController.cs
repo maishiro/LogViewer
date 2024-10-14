@@ -1,46 +1,36 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LogViewer.Hubs;
 using LogViewer.Models;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LogViewer.Controllers
 {
+    [ApiController]
+    [Route( "api/[controller]" )]
     public class LogController : Controller
     {
         private readonly string _logDirectory;
         private readonly PageConfig _pageConfig;
+        private readonly IHubContext<LogHub> _hubContext;
 
-        public LogController( IConfiguration configuration, PageConfig pageConfig )
+        public LogController( IConfiguration configuration, PageConfig pageConfig, IHubContext<LogHub> hubContext )
         {
             _logDirectory = configuration ["LogSettings:LogDirectory"];
             _pageConfig = pageConfig;
+            _hubContext = hubContext;
         }
 
-        public IActionResult Index()
+        [HttpPost]
+        public async Task<IActionResult> Post( [FromBody] LogEntry gourmet )
         {
-            var logEntries = new List<LogEntry>();
+            // ここでデータを処理（例：データベースに保存）
 
-            foreach( var filePath in Directory.GetFiles( _logDirectory, "*.log" ) )
-            {
-                using( var fs = new FileStream( filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite ) )
-                using( var reader = new StreamReader( fs, Encoding.UTF8 ) )
-                {
-                    string line;
-                    while( ( line = reader.ReadLine() ) != null && logEntries.Count < _pageConfig.MaxEntries )
-                    {
-                        var parts = line.Split(' ', 2);
-                        if( parts.Length == 2 && DateTime.TryParse( parts [0], out DateTime timestamp ) )
-                        {
-                            logEntries.Add( new LogEntry { Timestamp = timestamp, Message = parts [1] } );
-                        }
-                    }
-                }
-            }
+            Console.WriteLine( $"{gourmet.ToString()}" );
 
-            ViewBag.PageConfig = _pageConfig;
-            return View( logEntries );
+            // SignalRを使用してクライアントに更新を通知
+            await _hubContext.Clients.All.SendAsync( "ReceiveLogEntry", gourmet );
+
+            return Ok( gourmet );
         }
     }
 }

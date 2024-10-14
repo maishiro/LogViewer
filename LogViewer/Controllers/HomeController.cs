@@ -1,15 +1,25 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using LogViewer.Models;
+using LogViewer.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LogViewer.Controllers;
 
 public class HomeController : Controller
 {
+    private readonly string _logDirectory;
+    private readonly PageConfig _pageConfig;
     private readonly ILogger<HomeController> _logger;
+    private readonly IHubContext<LogHub> _hubContext;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController( IConfiguration configuration, PageConfig pageConfig, ILogger<HomeController> logger, IHubContext<LogHub> hubContext )
     {
+        _hubContext = hubContext;
+
+	    _logDirectory = configuration ["LogSettings:LogDirectory"];
+	    _pageConfig = pageConfig;
+   	
         _logger = logger;
     }
 
