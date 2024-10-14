@@ -1,8 +1,35 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData ["Title"] = "Gourmet List";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h2>Log Entries</h2>
+
+<table id="gourmetTable">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/logHub")
+            .build();
+
+        connection.on("ReceiveLogEntry", (gourmet) => {
+            console.log("ReceiveLogEntry", gourmet);
+            const table = document.getElementById("gourmetTable").getElementsByTagName('tbody')[0];
+            const row = table.insertRow();
+            row.insertCell(0).textContent = gourmet.timestamp;
+            row.insertCell(1).textContent = gourmet.message;
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+    </script>
+}

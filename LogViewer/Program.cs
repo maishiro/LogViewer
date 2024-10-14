@@ -22,7 +22,7 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
-builder.Services.AddHostedService<LogMonitorService>(); // LogMonitorServiceを登録
+//builder.Services.AddHostedService<LogMonitorService>(); // LogMonitorServiceを登録
 
 
 // XML設定ファイルの読み込み
@@ -38,6 +38,44 @@ var pageConfig = new PageConfig
 };
 // PageConfigをDIコンテナに登録
 builder.Services.AddSingleton( pageConfig );
+
+
+int port = 5000; // 初期ポート番号
+
+// ConfigurationからUrlsを取得
+var urls = builder.Configuration["Urls"];
+// プログラム引数からUrlsを取得
+var argsUrls = args.FirstOrDefault(arg => arg.StartsWith("--urls="))?.Split('=')[1];
+if( !string.IsNullOrEmpty( argsUrls ) )
+{
+    urls = argsUrls;
+    var uri = new Uri( argsUrls );
+    if( uri != null )
+        port = uri.Port;
+
+}
+if( string.IsNullOrEmpty( urls ) )
+{
+    while( true )
+    {
+        try
+        {
+            builder.WebHost.UseUrls( $"http://*:{port}" );
+            Console.WriteLine( $"Trying to start server on port {port}" );
+            break;
+        }
+        catch( Exception )
+        {
+            Console.WriteLine( $"Port {port} is in use, trying next port..." );
+            port++;
+        }
+    }
+}
+else
+{
+    builder.WebHost.UseUrls( urls );
+    Console.WriteLine( $"Using configured URLs: {urls}" );
+}
 
 
 var app = builder.Build();
@@ -58,7 +96,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Log}/{action=Index}/{id?}" );
+    pattern: "{controller=Home}/{action=Index}/{id?}" );
 app.MapHub<LogHub>( "/logHub" );
 
 app.Run();
