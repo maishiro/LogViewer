@@ -1,12 +1,16 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace LogViewer.Models
 {
     public class LogEntry
     {
         [JsonPropertyName( "timestamp" )]
-        public DateTime Timestamp { get; set; }
+        public string Timestamp { get; set; }
         [JsonPropertyName( "message" )]
         public string Message { get; set; } = string.Empty;
+
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement> AdditionalData { get; set; }
     }
 }
