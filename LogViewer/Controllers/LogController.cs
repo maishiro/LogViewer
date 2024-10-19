@@ -21,16 +21,17 @@ namespace LogViewer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post( [FromBody] LogEntry gourmet )
+        public async Task<IActionResult> Post( [FromBody] List<LogEntry> body )
         {
             // ここでデータを処理（例：データベースに保存）
 
-            Console.WriteLine( $"{gourmet.ToString()}" );
+            Console.WriteLine( $"{body.ToString()}" );
 
             // SignalRを使用してクライアントに更新を通知
-            await _hubContext.Clients.All.SendAsync( "ReceiveLogEntry", gourmet );
+            foreach( var item in body )
+                await _hubContext.Clients.All.SendAsync( "ReceiveLogEntry", item );
 
-            return Ok( gourmet );
+            return Ok( body );
         }
     }
 }
